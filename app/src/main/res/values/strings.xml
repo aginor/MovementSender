@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MovementSender</string>
+
+    <string name="description">Sending data to:</string>
+    <string name="host">host</string>
+    <string name="port">port</string>
+    <string name="action_settings">Settings</string>
+</resources>
