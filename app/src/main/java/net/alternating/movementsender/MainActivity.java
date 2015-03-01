@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -46,6 +47,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     private static final String rotationFilename = "rotationFile.txt";
     private static final String accelerationFilename = "accelerationFile.txt";
+    private File rotationFile;
+    private File accelerationFile;
 
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -75,25 +78,25 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     try {
                         if (isExternalStorageWritable()) {
                             Log.d(TAG,"External storage for logging");
-                            File rotationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), rotationFilename);
-                            File accelerationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), accelerationFilename);
+                            rotationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), rotationFilename);
+                            accelerationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), accelerationFilename);
                             if (rotationFile.exists())
                                 rotationFile.delete();
                             rotationFile.createNewFile();
                             if (accelerationFile.exists())
                                 accelerationFile.delete();
                             accelerationFile.createNewFile();
-                            Log.d(TAG,rotationFile.getAbsolutePath());
+
                             rotationStream = new PrintStream(new FileOutputStream(rotationFile));
                             accelerationStream = new PrintStream(new FileOutputStream(accelerationFile));
 
-                            rotationFile.setReadable(true,false);
-                            accelerationFile.setReadable(true,false);
+                            rotationFile.setReadable(true, false);
+                            accelerationFile.setReadable(true, false);
                         }
                         else {
                             Log.d(TAG, "Internal storage for logging");
-                            rotationStream = new PrintStream(openFileOutput(rotationFilename, Context.MODE_WORLD_READABLE));
-                            accelerationStream = new PrintStream(openFileOutput(accelerationFilename, Context.MODE_WORLD_READABLE));
+                            rotationStream = new PrintStream(openFileOutput(rotationFilename, Context.MODE_PRIVATE));
+                            accelerationStream = new PrintStream(openFileOutput(accelerationFilename, Context.MODE_PRIVATE));
                         }
                     } catch (Exception e) {
                         loggingEnabled = false;
@@ -109,9 +112,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         Log.d(TAG, "Stopping Logging");
                         rotationStream.flush();
                         rotationStream.close();
+                        MediaScannerConnection.scanFile(getApplicationContext(),new String[] {rotationFile.getAbsolutePath()},null,null);
                         rotationStream = null;
                         accelerationStream.flush();
                         accelerationStream.close();
+                        MediaScannerConnection.scanFile(getApplicationContext(),new String[] {accelerationFile.getAbsolutePath()},null,null);
                         accelerationStream = null;
                         loggingEnabled = false;
                         logButton.setText("Start Logging");
