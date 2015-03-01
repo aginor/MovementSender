@@ -35,8 +35,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send"
-        android:id="@+id/send_button"
+        android:text="Start Logging"
+        android:id="@+id/log_button"
         android:layout_below="@+id/host"
         android:layout_centerHorizontal="true" />
 
